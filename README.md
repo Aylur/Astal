@@ -1,7 +1,1 @@
-# Astal
-
-WIP GTK4 version of [AGS](https://github.com/Aylur/ags)
-
-TODO
-- systray
-- circularprogress
+Archived in favor of [astal](https://github.com/astal-sh)
