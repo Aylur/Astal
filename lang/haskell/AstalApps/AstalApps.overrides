@@ -1,0 +1,5 @@
+namespace AstalApps
+
+delete-node AstalApps/Application/app
+delete-node AstalApps/Application/get_app
+delete-node AstalApps/Application/set_app

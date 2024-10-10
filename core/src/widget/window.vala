@@ -1,6 +1,7 @@
 using GtkLayerShell;
 
 namespace Astal {
+[Flags]
 public enum WindowAnchor {
     NONE = 0,
     TOP = 1,

@@ -1,0 +1,28 @@
+namespace AstalNetwork
+
+delete-node AstalNetwork/internet_from_device
+delete-node AstalNetwork/Network/client
+delete-node AstalNetwork/Network/get_client
+
+delete-node AstalNetwork/Wifi/device
+delete-node AstalNetwork/Wifi/get_device
+delete-node AstalNetwork/Wifi/set_device
+delete-node AstalNetwork/Wifi/active-connection
+delete-node AstalNetwork/Wifi/get_active_connection
+delete-node AstalNetwork/Wifi/state-changed
+
+delete-node AstalNetwork/Wired/connection
+delete-node AstalNetwork/Wired/device
+delete-node AstalNetwork/Wired/get_device
+delete-node AstalNetwork/Wired/set_device
+
+delete-node AstalNetwork/AccessPoint/mode
+delete-node AstalNetwork/AccessPoint/get_mode
+delete-node AstalNetwork/AccessPoint/flags
+delete-node AstalNetwork/AccessPoint/get_flags
+delete-node AstalNetwork/AccessPoint/rsn-flags
+delete-node AstalNetwork/AccessPoint/get_rsn_flags
+delete-node AstalNetwork/AccessPoint/wpa-flags
+delete-node AstalNetwork/AccessPoint/get_wpa_flags
+
+

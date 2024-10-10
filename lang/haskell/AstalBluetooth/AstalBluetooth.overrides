@@ -1,0 +1,4 @@
+namespace AstalBluetooth
+
+set-attr AstalBluetooth/Device/adapter/@type name utf8
+set-attr AstalBluetooth/Device/get_adapter/@return-value/@type name utf8

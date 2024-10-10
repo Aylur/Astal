@@ -1,0 +1,7 @@
+namespace AstalWp
+
+delete-node AstalWp/Endpoint/media-class
+
+delete-node AstalWp/Device/device-type
+
+delete-node AstalWp/Wp/scale
