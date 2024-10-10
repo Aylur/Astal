@@ -1,0 +1,13 @@
+option(
+  'introspection',
+  type: 'boolean',
+  value: true,
+  description: 'Build gobject-introspection data',
+)
+
+option(
+  'vapi',
+  type: 'boolean',
+  value: true,
+  description: 'Generate vapi data (needs vapigen & introspection option)',
+)

@@ -85,6 +85,7 @@ export default defineConfig({
                     { text: "Auth", link: "/guide/libraries/auth" },
                     { text: "Battery", link: "/guide/libraries/battery" },
                     { text: "Bluetooth", link: "/guide/libraries/bluetooth" },
+                    { text: "Cava", link: "/guide/libraries/cava" },
                     { text: "Hyprland", link: "/guide/libraries/hyprland" },
                     { text: "Mpris", link: "/guide/libraries/mpris" },
                     { text: "Network", link: "/guide/libraries/network" },
