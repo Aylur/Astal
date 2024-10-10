@@ -23,8 +23,8 @@ export default defineConfig({
         outline: "deep",
 
         footer: {
-            message: 'Released under the LGPL v2.1 License',
-            copyright: 'Logo is created by VDawg'
+            message: "Released under the LGPL v2.1 License",
+            copyright: "Logo is created by VDawg",
         },
 
         nav: [
@@ -44,7 +44,7 @@ export default defineConfig({
                     { text: "Contributing", link: github("/blob/main/CONTRIBUTING.md") },
                     { text: "Changelog", link: github("/blob/main/CHANGELOG.md") },
                 ],
-            }
+            },
         ],
 
         sidebar: [
@@ -113,6 +113,6 @@ export default defineConfig({
 
         search: {
             provider: "local",
-        }
+        },
     },
 })

@@ -134,6 +134,10 @@ local function Workspaces()
 	return Widget.Box({
 		class_name = "Workspaces",
 		bind(hypr, "workspaces"):as(function(wss)
+			table.sort(wss, function(a, b)
+				return a.id < b.id
+			end)
+
 			return map(wss, function(ws)
 				return Widget.Button({
 					class_name = bind(hypr, "focused-workspace"):as(function(fw)
@@ -142,7 +146,9 @@ local function Workspaces()
 					on_clicked = function()
 						ws:focus()
 					end,
-					label = bind(ws, "id"):as(tostring),
+					label = bind(ws, "id"):as(function(v)
+						return type(v) == "number" and string.format("%.0f", v) or v
+					end),
 				})
 			end)
 		end),

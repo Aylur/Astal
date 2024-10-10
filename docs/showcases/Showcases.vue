@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import showcases from './showcases'
-import Showcase from './Showcase.vue'
+import showcases from "./showcases"
+import Showcase from "./Showcase.vue"
 </script>
 
 <template>
     <div class="Showcases">
         <template v-for="(showcase, index) in showcases" :key="index">
             <div v-if="Array.isArray(showcase)" class="row">
-                <div v-for="(elem, elemIndex) in showcase" :key="elemIndex" class="item"
-                    :class="`grid-${showcase.length}`">
+                <div
+                    v-for="(elem, elemIndex) in showcase"
+                    :key="elemIndex"
+                    class="item"
+                    :class="`grid-${showcase.length}`"
+                >
                     <Showcase v-bind="elem" />
                 </div>
             </div>
