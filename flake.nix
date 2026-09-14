@@ -36,7 +36,7 @@
       river = mkPkg ./lib/river;
       tray = mkPkg ./lib/tray;
       wireplumber = mkPkg ./lib/wireplumber;
-      wl = mkPkg ./lib/wl;
+      wl = mkPkg ./lib/wl/wl;
       workspace = mkPkg ./lib/workspace;
     });
 
