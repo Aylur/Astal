@@ -23,9 +23,12 @@ deps = [
   dependency('astal-io-0.1'),
   dependency('gtk4'),
   dependency('gtk4-layer-shell-0'),
+  dependency('glycin-2'),
+  dependency('glycin-gtk4-2'),
 ]
 
 sources = [config] + files(
+  'widget/animated-paintable.vala',
   'widget/bin.vala',
   'widget/box.vala',
   'widget/gizmo.vala',
@@ -62,6 +65,8 @@ gir_tgt = custom_target(
       'astal-io-0.1',
       'gtk4',
       'gtk4-layer-shell-0',
+      'glycin-2',
+      'glycin-gtk4-2'
     ),
     sources,
   ],
