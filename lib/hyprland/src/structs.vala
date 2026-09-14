@@ -45,4 +45,9 @@ public class Position : Object {
         y = int.parse(xy[1].strip());
     }
 }
+
+public enum ConfigProvider {
+    LUA = 0,
+    HYPRLANG = 1
+}
 }

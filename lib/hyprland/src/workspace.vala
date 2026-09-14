@@ -47,10 +47,20 @@ public class Workspace : Object {
     }
 
     public void focus() {
+        if(Hyprland.get_default().config_provider == ConfigProvider.LUA) {
+            Hyprland.get_default().dispatch("focus", "{workspace=" + id.to_string() + "}");
+            return;
+        }
+
         Hyprland.get_default().dispatch("workspace", id.to_string());
     }
 
     public void move_to(Monitor m) {
+        if(Hyprland.get_default().config_provider == ConfigProvider.LUA) {
+            Hyprland.get_default().dispatch("workspace.move", "{workspace=" + id.to_string() + ",monitor=" + m.id.to_string() + "}");
+            return;
+        }
+
         Hyprland.get_default().dispatch("moveworkspacetomonitor", id.to_string() + " " + m.id.to_string());
     }
 }

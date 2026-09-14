@@ -45,6 +45,7 @@ public class Hyprland : Object {
     public List<weak Monitor> monitors { owned get { return _monitors.get_values(); } }
     public List<weak Workspace> workspaces { owned get { return _workspaces.get_values(); } }
     public List<weak Client> clients { owned get { return _clients.get_values(); } }
+    public ConfigProvider config_provider { get; private set; default = ConfigProvider.HYPRLANG; }
 
     public Monitor get_monitor(int id) {
         return _monitors.get(id);
@@ -199,8 +200,42 @@ public class Hyprland : Object {
         return "";
     }
 
+    /**
+      * Send inline lua to Hyprland. (with `LUA` config provider only)
+      */
+    public void eval(string lua) {
+        var msg = "eval " + lua;
+        message_async.begin(msg, (_, res) => {
+                var err = message_async.end(res);
+                if (err != "ok") critical("eval error: %s", err);
+            });
+    }
+
+    /**
+      * Call a dispatcher in the Hyprland socket (without the `hl.dsp` prefix) 
+      * Please keep in mind that arguments are in the lua syntax, 
+      * you might need to add string quotes when needed
+      */
     public void dispatch(string dispatcher, string args) {
-        var msg = "dispatch " + dispatcher + " " + args;
+        var msg = "dispatch ";
+        if(this.config_provider == ConfigProvider.LUA) {
+            msg = msg + "hl.dsp." + dispatcher + "(" + args + ")";
+        } else {
+            msg = msg + dispatcher + " " + args;
+        }
+        message_async.begin(msg, (_, res) => {
+                var err = message_async.end(res);
+                if (err != "ok") critical("dispatch error: %s", err);
+            });
+    }
+
+    /**
+      * Call a dispatcher in the Hyprland socket (without the `hl.dsp` prefix) 
+      * Please keep in mind that arguments are in the lua syntax, 
+      * you might need to add string quotes when needed
+      */
+    public void dispatch_argv(string dispatcher, string[] args) {
+        var msg = "dispatch hl.dsp." + dispatcher + "(" + string.joinv(",", args) + ")";
         message_async.begin(msg, (_, res) => {
                 var err = message_async.end(res);
                 if (err != "ok") critical("dispatch error: %s", err);
@@ -208,7 +243,12 @@ public class Hyprland : Object {
     }
 
     public void move_cursor(int x, int y) {
-        dispatch("movecursor", x.to_string() + " " + y.to_string());
+        if(this.config_provider == ConfigProvider.LUA) {
+            dispatch("cursor.move", "{x=" + x.to_string() + ",y=" + y.to_string() + "}");
+            return;
+        }
+
+       dispatch("movecursor", x.to_string() + " " + y.to_string()); 
     }
 
     // TODO: nag vaxry to make socket events and hyprctl more consistent
@@ -216,6 +256,13 @@ public class Hyprland : Object {
         var mons = Json.from_string(message("j/monitors")).get_array();
         var wrkspcs = Json.from_string(message("j/workspaces")).get_array();
         var clnts = Json.from_string(message("j/clients")).get_array();
+        
+        try {
+            var prov = Json.from_string(message("j/status")).get_object().get_member("configProvider").get_string();
+            if (prov == "lua") {
+                this.config_provider = ConfigProvider.LUA;
+            }
+        } catch (Error _) {}
 
         // create
         foreach (var mon in mons.get_elements()) {

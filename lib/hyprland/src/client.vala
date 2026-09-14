@@ -56,19 +56,39 @@ public class Client : Object {
     }
 
     public void kill() {
+        if(Hyprland.get_default().config_provider == ConfigProvider.LUA) {
+            Hyprland.get_default().dispatch("window.close", @"\"address:0x$address\"");
+            return;
+        }
+
         Hyprland.get_default().dispatch("closewindow", @"address:0x$address");
     }
 
     public void focus() {
+        if(Hyprland.get_default().config_provider == ConfigProvider.LUA) {
+            Hyprland.get_default().dispatch("focus", @"{window=\"address:0x$address\"}");
+            return;
+        }
+
         Hyprland.get_default().dispatch("focuswindow", @"address:0x$address");
     }
 
     public void move_to(Workspace ws) {
-        var id = ws.id;
-        Hyprland.get_default().dispatch("movetoworkspacesilent", @"$id,address:0x$address");
+        var id = ws.id.to_string();
+        if(Hyprland.get_default().config_provider == ConfigProvider.LUA) {
+            Hyprland.get_default().dispatch("window.move", @"{window=\"address:0x$address\",workspace=$id,follow=false}");
+            return;
+        }
+
+        Hyprland.get_default().dispatch("movetoworkspacesilent", @"$id,address:0x$address"); 
     }
 
     public void toggle_floating() {
+        if(Hyprland.get_default().config_provider == ConfigProvider.LUA) {
+            Hyprland.get_default().dispatch("window.float", @"{window=\"address:0x$address\"}");
+            return;
+        }
+
         Hyprland.get_default().dispatch("togglefloating", @"address:0x$address");
     }
 }
