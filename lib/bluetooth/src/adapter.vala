@@ -2,9 +2,22 @@
  * Object representing an [[https://github.com/RadiusNetworks/bluez/blob/master/doc/adapter-api.txt|adapter]].
  */
 public class AstalBluetooth.Adapter : Object {
+    /**
+     * Seconds to wait for a power change to take effect before giving up
+     * on the transition. Toggling an adapter goes through rfkill, which on
+     * some systems takes a noticeable while, and can fail without a reply.
+     */
+    private const uint STATE_TIMEOUT = 30;
+
     private IAdapter proxy;
+    private uint state_timeout = 0;
 
     internal string object_path { owned get; private set; }
+
+    /**
+     * State of this adapter, including the transitions between on and off.
+     */
+    public AdapterState state { get; private set; default = AdapterState.OFF; }
 
     internal Adapter(IAdapter proxy) {
         this.proxy = proxy;
@@ -16,8 +29,25 @@ public class AstalBluetooth.Adapter : Object {
                 if (get_class().find_property(prop) != null) {
                     notify_property(prop);
                 }
+
+                if (prop == "powered") settle_state();
             }
         });
+
+        settle_state();
+    }
+
+    ~Adapter() {
+        if (state_timeout > 0) Source.remove(state_timeout);
+    }
+
+    private void settle_state() {
+        if (state_timeout > 0) {
+            Source.remove(state_timeout);
+            state_timeout = 0;
+        }
+
+        state = proxy.powered ? AdapterState.ON : AdapterState.OFF;
     }
 
     /**
@@ -72,7 +102,21 @@ public class AstalBluetooth.Adapter : Object {
      */
     public bool powered {
         get { return proxy.powered; }
-        set { proxy.powered = value; }
+        set {
+            if (value == proxy.powered) return;
+
+            state = value ? AdapterState.TURNING_ON : AdapterState.TURNING_OFF;
+
+            // the transition has to end even if the adapter never reports back
+            if (state_timeout > 0) Source.remove(state_timeout);
+            state_timeout = Timeout.add_seconds(STATE_TIMEOUT, () => {
+                state_timeout = 0;
+                state = proxy.powered ? AdapterState.ON : AdapterState.OFF;
+                return Source.REMOVE;
+            });
+
+            proxy.powered = value;
+        }
     }
 
     /**
@@ -113,8 +157,8 @@ public class AstalBluetooth.Adapter : Object {
      *
      * Possible errors: `InvalidArguments`, `Failed`.
      */
-    public void remove_device(Device device) throws Error {
-        proxy.remove_device(device.object_path);
+    public async void remove_device(Device device) throws Error {
+        yield proxy.remove_device(device.object_path);
     }
 
     /**
@@ -122,8 +166,8 @@ public class AstalBluetooth.Adapter : Object {
      *
      * Possible errors: `NotReady`, `Failed`.
      */
-    public void start_discovery() throws Error {
-        proxy.start_discovery();
+    public async void start_discovery() throws Error {
+        yield proxy.start_discovery();
     }
 
     /**
@@ -131,7 +175,33 @@ public class AstalBluetooth.Adapter : Object {
      *
      * Possible errors: `NotReady`, `Failed`, `NotAuthorized`.
      */
-    public void stop_discovery() throws Error {
-        proxy.stop_discovery();
+    public async void stop_discovery() throws Error {
+        yield proxy.stop_discovery();
+    }
+}
+
+/**
+ * State of an [class@AstalBluetooth.Adapter].
+ */
+public enum AstalBluetooth.AdapterState {
+    /** No adapter is present. */
+    ABSENT,
+    /** The adapter is not powered. */
+    OFF,
+    /** The adapter is powered. */
+    ON,
+    /** The adapter is powering on. */
+    TURNING_ON,
+    /** The adapter is powering off. */
+    TURNING_OFF;
+
+    public string to_string() {
+        switch (this) {
+            case OFF: return "off";
+            case ON: return "on";
+            case TURNING_ON: return "turning_on";
+            case TURNING_OFF: return "turning_off";
+            default: return "absent";
+        }
     }
 }

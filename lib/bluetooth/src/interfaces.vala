@@ -1,8 +1,8 @@
 [DBus(name = "org.bluez.Adapter1")]
 private interface AstalBluetooth.IAdapter : DBusProxy {
-    public abstract void remove_device(ObjectPath device) throws Error;
-    public abstract void start_discovery() throws Error;
-    public abstract void stop_discovery() throws Error;
+    public abstract async void remove_device(ObjectPath device) throws Error;
+    public abstract async void start_discovery() throws Error;
+    public abstract async void stop_discovery() throws Error;
 
     public abstract string[] uuids { owned get; }
     public abstract bool discoverable { get; set; }
@@ -20,12 +20,12 @@ private interface AstalBluetooth.IAdapter : DBusProxy {
 
 [DBus(name = "org.bluez.Device1")]
 private interface AstalBluetooth.IDevice : DBusProxy {
-    public abstract void cancel_pairing() throws Error;
+    public abstract async void cancel_pairing() throws Error;
     public abstract async void connect() throws Error;
-    public abstract void connect_profile(string uuid) throws Error;
+    public abstract async void connect_profile(string uuid) throws Error;
     public abstract async void disconnect() throws Error;
-    public abstract void disconnect_profile(string uuid) throws Error;
-    public abstract void pair() throws Error;
+    public abstract async void disconnect_profile(string uuid) throws Error;
+    public abstract async void pair() throws Error;
 
     public abstract string[] uuids { owned get; }
     public abstract bool blocked { get; set; }

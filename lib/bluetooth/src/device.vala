@@ -17,17 +17,29 @@ public class AstalBluetooth.Device : Object {
                 if (get_class().find_property(prop) != null) {
                     notify_property(prop);
                 }
+
+                if (prop == "icon") notify_property("icon-name");
             }
         });
     }
 
-    internal void set_battery(Battery battery) {
+    private ulong battery_handler = 0;
+
+    internal void set_battery(Battery? battery) {
+        if ((battery_handler > 0) && (this.battery != null)) {
+            this.battery.disconnect(battery_handler);
+            battery_handler = 0;
+        }
+
         this.battery = battery;
 
+        if (battery != null) {
+            battery_handler = battery.notify["percentage"].connect(() => {
+                notify_property("battery_percentage");
+            });
+        }
+
         notify_property("battery_percentage");
-        battery.notify["percentage"].connect((obj, pspec) => {
-            notify_property("battery_percentage");
-        });
     }
 
     /**
@@ -96,6 +108,19 @@ public class AstalBluetooth.Device : Object {
      * Indicates if this device is currently trying to be connected.
      */
     public bool connecting { get; private set; }
+
+    /**
+     * Symbolic icon name for this device, based on
+     * [property@AstalBluetooth.Device:icon].
+     */
+    public string icon_name {
+        owned get {
+            var name = proxy.icon;
+            if (name == null) return "bluetooth-symbolic";
+
+            return name + "-symbolic";
+        }
+    }
 
     /**
      * If set to `true` any incoming connections from the device will be immediately rejected.
@@ -168,8 +193,8 @@ public class AstalBluetooth.Device : Object {
      *
      * @param uuid the remote service UUID.
      */
-    public void connect_profile(string uuid) throws Error {
-        proxy.connect_profile(uuid);
+    public async void connect_profile(string uuid) throws Error {
+        yield proxy.connect_profile(uuid);
     }
 
     /**
@@ -179,8 +204,8 @@ public class AstalBluetooth.Device : Object {
      *
      * @param uuid the remote service UUID.
      */
-    public void disconnect_profile(string uuid) throws Error {
-        proxy.disconnect_profile(uuid);
+    public async void disconnect_profile(string uuid) throws Error {
+        yield proxy.disconnect_profile(uuid);
     }
 
     /**
@@ -190,8 +215,8 @@ public class AstalBluetooth.Device : Object {
      * `AuthenticationCanceled`, `AuthenticationFailed`, `AuthenticationRejected`,
      * `AuthenticationTimeout`, `ConnectionAttemptFailed`.
      */
-    public void pair() throws Error {
-        proxy.pair();
+    public async void pair() throws Error {
+        yield proxy.pair();
     }
 
     /**
@@ -200,7 +225,7 @@ public class AstalBluetooth.Device : Object {
      *
      * Possible errors: `DoesNotExist`, `Failed`.
      */
-    public void cancel_pairing() throws Error {
-        proxy.cancel_pairing();
+    public async void cancel_pairing() throws Error {
+        yield proxy.cancel_pairing();
     }
 }
